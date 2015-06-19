@@ -38,8 +38,29 @@ corpus = corpora.Corpus.from_file("my corpus",
                                   open(args.input_filename))
 
 logging.info("Extracting system mentions")
+L = []
 for doc in corpus:
     doc.system_mentions = mention_extractor.extract_system_mentions(doc)
+    for zz in doc.system_mentions:
+        print zz.attributes['tokens']
+    i = 0
+    M = {}
+    for zz in doc.annotated_mentions:
+        id = zz.attributes['annotated_set_id']
+        if id not in M:
+            M[id] = {'klass': [], 'mentions': []}
+        M[id]['mentions'].append((zz.attributes['tokens']))
+        M[id]['klass'].append(zz.attributes['semantic_class'])
+        """
+        if zz.attributes['annotated_set_id'] is not None:
+            print zz.attributes['tokens']
+            """
+        i += 1
+    L.append(M)
+import joblib
+joblib.dump(L, 'L.pkl')
+
+sys.exit()
 
 negative_features = [features.not_modifier,
                      features.not_compatible,
